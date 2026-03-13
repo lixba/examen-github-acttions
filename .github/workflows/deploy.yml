@@ -1,0 +1,35 @@
+name: deploy
+
+on:
+  pull_request:
+    branches: ["main"]
+
+permissions:
+  id-token: write
+  contents: read
+
+env: 
+  DOTNET_VERSION: '10.0.103'
+  BUILD_CONFIGURATION: 'Release'
+
+jobs:
+  deploy:
+    name: "job deploy"
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup .NET Core
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+        
+      - name: Dotnet publish
+        run: dotnet publish MiProyectoMVC/MiProyectoMVC.csproj --configuration ${{ env.BUILD_CONFIGURATION }} -o artifacts
+    
+      - name : Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: uv-artifacts
+          path: artifacts/
